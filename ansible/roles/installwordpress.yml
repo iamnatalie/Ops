@@ -1,4 +1,0 @@
-- hosts: woo
-  roles:
-     - ansible-wordpress-ready-to-fly
-  sudo: yes
