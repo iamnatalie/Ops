@@ -1,0 +1,10 @@
+---
+# handlers file for installwordpress
+
+    - name: wordpress five minute install
+      uri:
+        url: "{{ wordpress_install_url }}"
+        method: POST
+        HEADER_Content-Type: "application/x-www-form-urlencoded"
+        body: "weblog_title={{ blog_title }}&user_name={{ blog_user }}&admin_email={{ blog_email }}&blog_public=true&admin_password={{ blog_password }}&admin_password2={{ blog_password }}"
+        status_code: 200

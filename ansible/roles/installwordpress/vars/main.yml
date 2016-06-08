@@ -1,0 +1,21 @@
+---
+# vars file for installwordpress
+    vagrant_ip: 10.0.0.10
+    hostname: localhost
+    modify_hostname: true
+    wp5minute_install: true
+    wordpress_version: 4.4.2
+    wordpress_parent_path: /usr/share
+    wordpress_path:        "{{ wordpress_parent_path }}/wordpress"
+    wordpress_owner: www-data
+    wordpress_group: www-data
+
+    wordpress_db_name: siteonedb
+    wordpress_db_user: siteoneuser
+    wordpress_db_password: siteonepassword
+
+    wordpress_install_url: "http://{{ hostname }}/wp-admin/install.php?step=2"
+    blog_title: ANSIBLE_TEST
+    blog_user: userone
+    blog_password: passwordone
+    blog_email: foo@gmail.com

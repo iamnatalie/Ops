@@ -1,0 +1,66 @@
+---
+# tasks file for installwordpress
+
+    - name: ==> add host info
+      lineinfile: dest=/etc/hosts line="{{ vagrant_ip }} {{ hostname }}" state=present
+      when: modify_hostname
+
+    - debug: msg="==> download and extract wordpress"
+
+    - name: download wordpress tarball
+      get_url:
+        url: "https://tw.wordpress.org/wordpress-{{ wordpress_version }}-zh_TW.tar.gz"
+        #dest: /tmp/
+        dest: "{{ wordpress_parent_path }}"
+
+
+    #- name: extract wordpress tarball (command)
+    #  command: "tar -zxvf /tmp/wordpress-{{ wordpress_version }}-zh_TW.tar.gz"
+
+    #- name: extract wordpress tarball (command)
+    #  command: "mv /home/ubuntu/wordpress /usr/share/wordpress"
+
+    - name: extract wordpress tarball
+      unarchive:
+         src: "{{ wordpress_parent_path }}/wordpress-{{ wordpress_version }}-zh_TW.tar.gz"
+         dest: "{{ wordpress_parent_path }}"
+         owner: "{{ wordpress_owner }}"
+         group: "{{ wordpress_group }}"
+         copy: no
+
+    - debug: msg="==> install site conf file for wordpress"
+
+    - name: check if "default.conf.bak" target exists
+      stat: path=/etc/nginx/conf.d/default.conf
+      register: filecheck
+
+    - name: rename to "default.conf.bak"
+      command: mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
+      when: filecheck.stat.exists
+
+    - name: copy wordpress site conf for nginx
+      template:
+        src: nginx-wordpress.conf.j2
+        dest: /etc/nginx/conf.d/nginx-wordpress.conf
+      notify: restart nginx
+
+    - name: ==> set wordpress config
+      template:
+        src: wp-config.php.j2
+        dest: "{{ wordpress_path }}/wp-config.php"
+        owner: "{{ wordpress_owner }}"
+        group: "{{ wordpress_group }}"
+      notify: restart nginx
+
+    - name: install dependency - httplib2
+      apt: name=python-httplib2 state=present
+
+    - debug: msg="==>automate the '5-minute install' process"
+      when: wp5minute_install
+      tags: wp5
+
+    - name: trigger wordpress five minute install
+      command: echo "trigger wordpress five minute install"
+      when: wp5minute_install
+      notify: wordpress five minute install
+      tags: wp5
